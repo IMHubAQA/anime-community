@@ -1,0 +1,2 @@
+# anime-community
+community server
