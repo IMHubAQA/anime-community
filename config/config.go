@@ -17,9 +17,12 @@ type ServerConfig struct {
 	RedisConfig interface{} `yaml:"redisConfig"`
 }
 
-type LogConfig struct{}
-type MysqlConfig struct{}
-type RedisConfig struct{}
+type LogConfig struct {
+}
+type MysqlConfig struct {
+}
+type RedisConfig struct {
+}
 
 var serverConf *ServerConfig
 

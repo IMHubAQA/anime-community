@@ -1,0 +1,57 @@
+package constants
+
+import "fmt"
+
+type Error struct {
+	code int
+	msg  string
+}
+
+var (
+	Success = newError(200, "success")
+
+	commonError = newError(10000, "") // 自定义msg
+	ServerError = newError(10001, "服务繁忙")
+)
+
+func newError(code int, msg string) *Error {
+	return &Error{
+		code: code,
+		msg:  msg,
+	}
+}
+
+func (e *Error) GetCode() int {
+	if e == nil {
+		return 0
+	}
+	return e.code
+}
+
+func (e *Error) GetMsg() string {
+	if e == nil {
+		return ""
+	}
+	return e.msg
+}
+
+func (e *Error) IsSuccess() bool {
+	if e == nil {
+		return true
+	}
+	return e.code == Success.code
+}
+
+func (e *Error) String() string {
+	if e == nil {
+		return ""
+	}
+	return fmt.Sprintf("code=%v, msg=%v", e.code, e.msg)
+}
+
+func NewErrorWithMsg(msg string) *Error {
+	return &Error{
+		code: commonError.code,
+		msg:  msg,
+	}
+}
