@@ -1,3 +1,13 @@
 logConfig:
+
 mysqlConfig:
+  protocol:
+  addr:
+  userName:
+  passWord:
+  dbName:
+  charset:
+
 redisConfig:
+  addr:
+  passWord:

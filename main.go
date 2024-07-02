@@ -1,6 +1,9 @@
 package main
 
 import (
+	"context"
+
+	"anime-community/common/helper"
 	_ "anime-community/config"
 	"anime-community/router"
 
@@ -9,13 +12,13 @@ import (
 )
 
 func main() {
-	defer func() {
-		if r := recover(); r != nil {
-			logs.Error("panic :%v", r)
-		}
-	}()
+	defer helper.Recover(context.Background())
 
-	logs.Info("%v server is running", web.BConfig.AppName)
+	logs.Info(">>[%v] starting......", web.BConfig.AppName)
 
+	run()
+}
+
+func run() {
 	router.Init()
 }

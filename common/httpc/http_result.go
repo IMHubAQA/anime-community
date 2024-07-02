@@ -1,4 +1,6 @@
-package constants
+package httpc
+
+import "anime-community/common/constants"
 
 const (
 	_HTTP_CODE_KEY = "code"
@@ -28,20 +30,20 @@ func (hr *HttpResult) Append(key string, value interface{}) *HttpResult {
 }
 
 func (hr *HttpResult) Ok() *HttpResult {
-	return hr.appendErr(Success)
+	return hr.appendErr(constants.Success)
 }
 
 func (hr *HttpResult) OkWithData(data interface{}) *HttpResult {
-	hr = hr.appendErr(Success)
+	hr = hr.appendErr(constants.Success)
 	hr.values[_HTTP_DATA_KEY] = data
 	return hr
 }
 
-func (hr *HttpResult) Fail(err *Error) *HttpResult {
+func (hr *HttpResult) Fail(err *constants.Error) *HttpResult {
 	return hr.appendErr(err)
 }
 
-func (hr *HttpResult) appendErr(err *Error) *HttpResult {
+func (hr *HttpResult) appendErr(err *constants.Error) *HttpResult {
 	hr.values[_HTTP_CODE_KEY] = err.GetCode()
 	hr.values[_HTTP_MSG_KEY] = err.GetMsg()
 	return hr

@@ -2,6 +2,7 @@ package controller
 
 import (
 	"anime-community/common/constants"
+	"anime-community/common/httpc"
 
 	"github.com/beego/beego/v2/server/web"
 )
@@ -16,7 +17,7 @@ func (c *BaseController) JsonResp(resp map[string]interface{}) {
 }
 
 func (c *BaseController) FailJsonResp(err *constants.Error) {
-	resp := constants.NewHttpResult().Fail(err).Build()
+	resp := httpc.NewHttpResult().Fail(err).Build()
 	c.Data["json"] = resp
 	c.ServeJSON()
 }
