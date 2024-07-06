@@ -2,7 +2,6 @@ package httpc
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -10,6 +9,8 @@ import (
 	"net/url"
 	"strings"
 	"time"
+
+	"github.com/bytedance/sonic"
 )
 
 const (
@@ -67,7 +68,7 @@ func PostForm(ctx context.Context, url string, headers map[string]string, params
 func PostJson(ctx context.Context, url string, headers map[string]string, obj interface{}, timeout time.Duration) ([]byte, error) {
 	var body io.Reader
 	if obj != nil {
-		b, err := json.Marshal(obj)
+		b, err := sonic.Marshal(obj)
 		if err != nil {
 			return nil, err
 		}

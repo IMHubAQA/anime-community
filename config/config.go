@@ -8,6 +8,8 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
+//TODO:hot update
+
 const (
 	_CONFIG_FILE_PATH = "./conf/config.yaml"
 )

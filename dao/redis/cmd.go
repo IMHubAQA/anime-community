@@ -9,7 +9,7 @@ import (
 )
 
 const (
-	_SINGLE_MUTI_SIZE = 20
+	_SINGLE_MUTI_SIZE = 50
 )
 
 func splitKeys(curr int, length int) int {
@@ -50,9 +50,9 @@ func MutiGet(ctx context.Context, keys []string) (map[string]string, error) {
 	return m, nil
 }
 
-func MutiSet(ctx context.Context, keys, values []string, expireTime time.Duration) bool {
+func MutiSet(ctx context.Context, keys, values []string, expireTime time.Duration) error {
 	if len(keys) != len(values) {
-		return false
+		return fmt.Errorf("len(keys) != len(values)")
 	}
 	offset := 0
 	length := len(keys)
@@ -63,10 +63,11 @@ func MutiSet(ctx context.Context, keys, values []string, expireTime time.Duratio
 			pipe.Set(ctx, keys[i], values[i], expireTime)
 		}
 		offset = netxOffset
+
 		_, err := pipe.Exec(ctx)
 		if err != nil {
-			return false
+			return err
 		}
 	}
-	return true
+	return nil
 }

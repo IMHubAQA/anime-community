@@ -10,6 +10,11 @@ const (
 	ANIMEPOST_TYPE_MAKEUP            // 约妆
 )
 
+var ANIMEPOST_TYPE_SET = map[int]struct{}{
+	ANIMEPOST_TYPE_NORMAL: {},
+	ANIMEPOST_TYPE_MAKEUP: {},
+}
+
 type AnimePost struct {
 	Id         int64  `json:"id" gorm:"column:id"`                                        //
 	PostType   uint8  `json:"postType" gorm:"column:post_type"`                           // 帖子类型

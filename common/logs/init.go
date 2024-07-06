@@ -1,7 +1,6 @@
 package logs
 
 import (
-	"anime-community/config"
 	"context"
 	"sync"
 	"time"
@@ -9,6 +8,8 @@ import (
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 	"gopkg.in/natefinch/lumberjack.v2"
+
+	"anime-community/config"
 )
 
 var errorLogger *zap.SugaredLogger
