@@ -5,6 +5,8 @@ import (
 
 	"anime-community/common/helper"
 	_ "anime-community/config"
+	_ "anime-community/dao/mysql"
+	_ "anime-community/dao/redis"
 	"anime-community/router"
 
 	"github.com/beego/beego/v2/core/logs"

@@ -3,6 +3,7 @@ package mysql
 import (
 	"fmt"
 
+	"github.com/beego/beego/v2/core/logs"
 	gomysql "gorm.io/driver/mysql"
 	"gorm.io/gorm"
 
@@ -21,6 +22,7 @@ func init() {
 		panic(err)
 	}
 	communityClient = db
+	logs.Info("load db success. ")
 }
 
 func getDsn(conf *config.MysqlConfig) string {

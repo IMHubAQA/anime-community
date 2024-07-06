@@ -1,13 +1,19 @@
 logConfig:
 
 mysqlConfig:
-  protocol:
-  addr:
-  userName:
-  passWord:
-  dbName:
-  charset:
+  protocol: "tcp"
+  addr: "122.51.70.205:3306"
+  userName: "root"
+  passWord: "Vvv266244!"
+  dbName: "community"
+  charset: "utf8mb4"
 
 redisConfig:
   addr:
+    - 120.55.188.192:7001
+    - 120.55.188.192:7002
+    - 120.55.188.192:7003
+    - 120.55.188.192:7004
+    - 120.55.188.192:7005
+    - 120.55.188.192:7006
   passWord:
