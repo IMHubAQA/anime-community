@@ -5,15 +5,16 @@
 
 ## 详细说明
 
-### 技术栈
+### 技术选型
 - 语言：golang
 - web框架：beego
-- orm : gorm
+- orm: gorm
+- 日志：zap
 - 数据库：mysql
-- 分布式缓存：reids
+- 分布式缓存：redis
 - 本地缓存：freeCache
 - 搜索引擎：elasticsearch
-- 消息队列：暂用redis
+- 消息队列：暂用redis list
 
 ### 项目文档
  - [figma](https://www.figma.com/design/cp8KS1Vix605UPezKABcmC/live-chat?node-id=0-1&t=28TBsFaB5ItGOh4X-0)

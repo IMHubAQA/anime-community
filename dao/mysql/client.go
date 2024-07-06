@@ -1,9 +1,12 @@
 package mysql
 
 import (
+	"context"
 	"fmt"
+	"sync"
 
-	"github.com/beego/beego/v2/core/logs"
+	"anime-community/common/logs"
+
 	gomysql "gorm.io/driver/mysql"
 	"gorm.io/gorm"
 
@@ -12,17 +15,21 @@ import (
 
 var communityClient *gorm.DB
 
-func init() {
-	dsn := getDsn(config.GetServerConfig().MysqlConfig)
-	if dsn == "" {
-		panic("load mysql config fail.")
-	}
-	db, err := gorm.Open(gomysql.Open(dsn), &gorm.Config{})
-	if err != nil {
-		panic(err)
-	}
-	communityClient = db
-	logs.Info("load db success. ")
+var initOnce sync.Once
+
+func Init(ctx context.Context) {
+	initOnce.Do(func() {
+		dsn := getDsn(config.GetServerConfig().MysqlConfig)
+		if dsn == "" {
+			panic("load mysql config fail.")
+		}
+		db, err := gorm.Open(gomysql.Open(dsn), &gorm.Config{})
+		if err != nil {
+			panic(err)
+		}
+		communityClient = db
+		logs.Infof(ctx, "load db success. ")
+	})
 }
 
 func getDsn(conf *config.MysqlConfig) string {

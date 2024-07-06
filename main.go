@@ -5,23 +5,30 @@ import (
 
 	"anime-community/common/helper"
 	"anime-community/common/logs"
-	_ "anime-community/config"
-	_ "anime-community/dao/mysql"
-	_ "anime-community/dao/redis"
+	"anime-community/config"
+	"anime-community/dao/mysql"
+	"anime-community/dao/redis"
 	"anime-community/router"
 
-	//"github.com/beego/beego/v2/core/logs"
 	"github.com/beego/beego/v2/server/web"
 )
 
 func main() {
-	defer helper.Recover(context.Background())
+	ctx := logs.NewTraceContext(context.Background())
+	defer logs.Sync()
+	defer helper.Recover(ctx)
 
-	logs.Info(">>[%v] starting......", web.BConfig.AppName)
-
-	run()
+	InitServer(ctx)
 }
 
-func run() {
+func InitServer(ctx context.Context) {
+	config.Init()
+	logs.Init()
+
+	redis.Init(ctx)
+	mysql.Init(ctx)
+
+	logs.Infof(ctx, "[%v:%v] starting......", web.BConfig.AppName, web.BConfig.Listen.HTTPPort)
+
 	router.Init()
 }

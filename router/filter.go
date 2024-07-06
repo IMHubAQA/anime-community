@@ -1,7 +1,9 @@
 package router
 
 import (
-	"github.com/beego/beego/v2/core/logs"
+	"anime-community/common/logs"
+	ccontext "context"
+
 	"github.com/beego/beego/v2/server/web"
 	"github.com/beego/beego/v2/server/web/context"
 	"github.com/beego/beego/v2/server/web/filter/cors"
@@ -17,7 +19,7 @@ func initFilter() {
 	}))
 
 	web.InsertFilter("*", web.BeforeExec, func(ctx *context.Context) {
-		logs.Info("method:%v, url:%v, useragent:%v, refer:%v, ip:%v",
+		logs.Infof(ccontext.Background(), "method:%v, url:%v, useragent:%v, refer:%v, ip:%v",
 			ctx.Request.Method, ctx.Request.URL, ctx.Input.UserAgent(), ctx.Input.Refer(), ctx.Input.IP())
 	})
 }

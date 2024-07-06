@@ -2,8 +2,9 @@ package config
 
 import (
 	"io/ioutil"
+	"log"
+	"sync"
 
-	"github.com/beego/beego/v2/core/logs"
 	"gopkg.in/yaml.v3"
 )
 
@@ -21,7 +22,8 @@ type LogConfig struct {
 	FilePath    string `yaml:"filePath"`
 	ErrFilePath string `yaml:"errFilePath"`
 	MaxSize     int    `yaml:"maxSize"`
-	MaxDay      int    `yaml:"maxDay"`
+	MaxAge      int    `yaml:"maxAge"`
+	MaxBackups  int    `yaml:"maxBackups"`
 }
 type MysqlConfig struct {
 	Protocol string `yaml:"protocol"`
@@ -37,22 +39,37 @@ type RedisConfig struct {
 }
 
 var serverConf *ServerConfig
+var initOnce sync.Once
 
-func init() {
-	b, err := ioutil.ReadFile(_CONFIG_FILE_PATH)
-	if err != nil {
-		panic(err)
-	}
+func Init() {
+	initOnce.Do(func() {
+		b, err := ioutil.ReadFile(_CONFIG_FILE_PATH)
+		if err != nil {
+			panic(err)
+		}
 
-	serverConf = &ServerConfig{}
-	err = yaml.Unmarshal(b, serverConf)
-	if err != nil {
-		panic(err)
-	}
-
-	logs.Info("load config succes. %v", serverConf)
+		serverConf = &ServerConfig{}
+		err = yaml.Unmarshal(b, serverConf)
+		if err != nil || !serverConf.check() {
+			panic(err)
+		}
+		log.Printf("load config succes. %v", serverConf)
+	})
 }
 
 func GetServerConfig() *ServerConfig {
 	return serverConf
+}
+
+func (c *ServerConfig) check() bool {
+	if c.LogConfig == nil {
+		return false
+	}
+	if c.RedisConfig == nil {
+		return false
+	}
+	if c.MysqlConfig == nil {
+		return false
+	}
+	return true
 }

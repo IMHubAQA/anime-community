@@ -1,4 +1,9 @@
 logConfig:
+  filePath: "./logs/info.log" 
+  errFilePath: "./logs/error.log"
+  maxSize: 100
+  maxAge: 7
+  maxBackups: 50
 
 mysqlConfig:
   protocol: "tcp"

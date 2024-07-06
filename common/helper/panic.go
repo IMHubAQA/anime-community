@@ -4,18 +4,18 @@ import (
 	"context"
 	"runtime"
 
-	"github.com/beego/beego/v2/core/logs"
+	"anime-community/common/logs"
 )
 
 func Recover(ctx context.Context, fallBacks ...func()) {
 	defer func() {
 		if r := recover(); r != nil {
-			recoverStat(r)
+			recoverStat(ctx, r)
 		}
 	}()
 
 	if r := recover(); r != nil {
-		recoverStat(r)
+		recoverStat(ctx, r)
 		for _, fallBack := range fallBacks {
 			if fallBack != nil {
 				fallBack()
@@ -24,8 +24,8 @@ func Recover(ctx context.Context, fallBacks ...func()) {
 	}
 }
 
-func recoverStat(err interface{}) {
+func recoverStat(ctx context.Context, err interface{}) {
 	var buf [2048]byte
 	n := runtime.Stack(buf[:], false)
-	logs.Error("panic. info=%v, err=%v", n, err)
+	logs.Errorf(ctx, "panic. info=%v, err=%v", n, err)
 }

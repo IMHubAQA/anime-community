@@ -2,16 +2,23 @@ package redis
 
 import (
 	"anime-community/config"
+	"context"
+	"sync"
 
-	"github.com/beego/beego/v2/core/logs"
+	"anime-community/common/logs"
+
 	goRedis "github.com/go-redis/redis/v8"
 )
 
 var communityClient *goRedis.ClusterClient
+var initOnce sync.Once
 
-func init() {
-	communityClient = newRedisClient()
-	logs.Info("load redis success. ")
+func Init(ctx context.Context) {
+	initOnce.Do(func() {
+		communityClient = newRedisClient()
+		logs.Infof(ctx, "load redis success. ")
+	})
+
 }
 
 func newRedisClient() *goRedis.ClusterClient {
