@@ -4,12 +4,13 @@ import (
 	"context"
 
 	"anime-community/common/helper"
+	"anime-community/common/logs"
 	_ "anime-community/config"
 	_ "anime-community/dao/mysql"
 	_ "anime-community/dao/redis"
 	"anime-community/router"
 
-	"github.com/beego/beego/v2/core/logs"
+	//"github.com/beego/beego/v2/core/logs"
 	"github.com/beego/beego/v2/server/web"
 )
 
