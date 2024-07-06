@@ -12,7 +12,7 @@ const (
 
 type AnimePost struct {
 	Id         int64  `json:"id" gorm:"column:id"`                                        //
-	PostType   uint8  `json:"postType" gorm:"column:postType"`                            // 帖子类型
+	PostType   uint8  `json:"postType" gorm:"column:post_type"`                           // 帖子类型
 	UserId     int64  `json:"user_id" gorm:"column:user_id"`                              // 用户id
 	Title      string `json:"title" gorm:"column:title"`                                  // 标题
 	Content    string `json:"content" gorm:"column:content"`                              // 内容

@@ -31,6 +31,7 @@ anime-community
 ├── model // 实体类
 ├── router // 接口路由
 └── service // 业务逻辑层
+└── task // 定时任务
 ```
 
 ### 部署流程
