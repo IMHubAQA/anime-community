@@ -10,8 +10,11 @@ type Error struct {
 var (
 	Success = newError(200, "success")
 
-	commonError = newError(10000, "") // 自定义msg
-	ServerError = newError(10001, "服务繁忙")
+	commonError    = newError(10000, "") // 自定义msg
+	ServerError    = newError(10001, "服务繁忙")
+	MysqlError     = newError(10002, "数据库失败")
+	RdisError      = newError(10003, "缓存失败")
+	NoSupportError = newError(10004, "功能不支持")
 )
 
 func newError(code int, msg string) *Error {

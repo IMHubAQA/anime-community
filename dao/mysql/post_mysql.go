@@ -1,21 +1,22 @@
 package mysql
 
 import (
-	"anime-community/model"
 	"context"
 	"fmt"
+
+	modele "anime-community/model/entity"
 )
 
 // 获取帖子列表，返回列表，是否最后一页
-func GetPostList(ctx context.Context, postType, page, pageSize int) ([]*model.AnimePost, bool, error) {
+func GetPostList(ctx context.Context, postType, page, pageSize int) ([]*modele.AnimePost, bool, error) {
 	tx := communityClient
-	resp := []*model.AnimePost{}
-	tx.Model(&model.AnimePost{}).
-		Where("post_type = ? and status = ?", postType, model.ANIMEPOST_STATUS_VALID).
+	resp := []*modele.AnimePost{}
+	tx.Model(&modele.AnimePost{}).
+		Where("post_type = ? and status = ?", postType, modele.ANIMEPOST_STATUS_VALID).
 		Offset(page * pageSize).
 		Limit(pageSize).
 		Order("create_time desc").
-		Find(resp)
+		Find(&resp)
 	if tx.Error != nil {
 		return nil, true, tx.Error
 	}

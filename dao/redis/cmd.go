@@ -6,10 +6,12 @@ import (
 	"time"
 
 	goRedis "github.com/go-redis/redis/v8"
+
+	"anime-community/common/logs"
 )
 
 const (
-	_SINGLE_MUTI_SIZE = 50
+	_SINGLE_MUTI_SIZE = 20
 )
 
 func splitKeys(curr int, length int) int {
@@ -20,6 +22,7 @@ func splitKeys(curr int, length int) int {
 }
 
 func MutiGet(ctx context.Context, keys []string) (map[string]string, error) {
+	logs.Infof(ctx, "MutiGet info. keys=%v", keys)
 	if len(keys) == 0 {
 		return nil, fmt.Errorf("empty key")
 	}
@@ -35,13 +38,14 @@ func MutiGet(ctx context.Context, keys []string) (map[string]string, error) {
 		offset = netxOffset
 
 		cmders, err := pipe.Exec(ctx)
-		if err != nil && err != goRedis.Nil {
+		if err != nil {
+			logs.Infof(ctx, "MutiGet fail. err=%v", err)
 			continue
 		}
-		m := make(map[string]string)
 		for i, cmder := range cmders {
 			result, err := cmder.(*goRedis.StringCmd).Result()
 			if err != nil {
+				logs.Infof(ctx, "MutiGet fail. err=%v", err)
 				continue
 			}
 			m[keys[i]] = result

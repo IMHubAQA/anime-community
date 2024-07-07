@@ -1,4 +1,8 @@
-package model
+package modelc
+
+import (
+	modele "anime-community/model/entity"
+)
 
 // 标签缓存
 type PostCategoryCache struct {
@@ -7,7 +11,7 @@ type PostCategoryCache struct {
 	Name     string `json:"name"`
 }
 
-func NewPostCategoryCache(entity *AnimePostCategory) *PostCategoryCache {
+func NewPostCategoryCache(entity *modele.AnimePostCategory) *PostCategoryCache {
 	if entity == nil {
 		return nil
 	}

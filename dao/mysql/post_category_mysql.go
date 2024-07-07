@@ -1,19 +1,19 @@
 package mysql
 
 import (
-	"anime-community/model"
+	modele "anime-community/model/entity"
 	"context"
 )
 
 // 获取帖子标签列表，
-func GetPostCategoryList(ctx context.Context, postType uint8, offset, limit int) ([]*model.AnimePostCategory, error) {
+func GetPostCategoryList(ctx context.Context, postType uint8, offset, limit int) ([]*modele.AnimePostCategory, error) {
 	tx := communityClient
-	resp := []*model.AnimePostCategory{}
-	tx.Model(&model.AnimePostCategory{}).
-		Where("post_type = ? and status = ?", postType, model.ANIMEPOST_STATUS_VALID).
+	resp := []*modele.AnimePostCategory{}
+	tx.Model(&modele.AnimePostCategory{}).
+		Where("post_type = ? and status = ?", postType, modele.ANIMEPOST_STATUS_VALID).
 		Offset(offset).
 		Limit(limit).
-		Find(resp)
+		Find(&resp)
 	if tx.Error != nil {
 		return nil, tx.Error
 	}
@@ -25,10 +25,10 @@ func GetPostCategoryList(ctx context.Context, postType uint8, offset, limit int)
 	return resp, nil
 }
 
-func GetAllPostCategoryList(ctx context.Context, postType uint8) ([]*model.AnimePostCategory, error) {
+func GetAllPostCategoryList(ctx context.Context, postType uint8) ([]*modele.AnimePostCategory, error) {
 	limit := 200
 	offset := 0
-	res := []*model.AnimePostCategory{}
+	res := []*modele.AnimePostCategory{}
 	for {
 		pageRes, err := GetPostCategoryList(ctx, postType, offset, limit)
 		if err != nil {

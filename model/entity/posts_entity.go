@@ -1,4 +1,4 @@
-package model
+package modele
 
 const (
 	ANIMEPOST_STATUS_VALID = iota + 1 // 正常
@@ -30,6 +30,14 @@ type AnimePost struct {
 
 func (a AnimePost) TableName() string {
 	return "anime_post"
+}
+
+type AnimePostAppendNormal struct {
+	Category []int `json:"category,omitempty"`
+}
+
+type AnimePostAppendMakeup struct {
+	Category []int `json:"category,omitempty"`
 }
 
 type AnimePostCategory struct {

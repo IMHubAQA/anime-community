@@ -27,5 +27,5 @@ func Recover(ctx context.Context, fallBacks ...func()) {
 func recoverStat(ctx context.Context, err interface{}) {
 	var buf [2048]byte
 	n := runtime.Stack(buf[:], false)
-	logs.Errorf(ctx, "panic. info=%v, err=%v", n, err)
+	logs.Errorf(ctx, "panic. info=%v, err=%v", string(buf[:n]), err)
 }

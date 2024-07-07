@@ -6,8 +6,8 @@ import (
 )
 
 const (
-	_REDIS_PREFIX     = "acomm"     // 业务前缀
-	_REDIS_LOCKPREFIX = "acommlock" // 锁前缀
+	_REDIS_PREFIX     = "acomm:"     // 业务前缀
+	_REDIS_LOCKPREFIX = "acommlock:" // 锁前缀
 )
 
 const (
@@ -35,6 +35,7 @@ func (rk *RedisKey) GetKey(suffixs ...string) string {
 	var bf bytes.Buffer
 	bf.WriteString(rk.key)
 	for _, suffix := range suffixs {
+		bf.WriteString(":")
 		bf.WriteString(suffix)
 	}
 	return bf.String()
