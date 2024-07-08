@@ -28,7 +28,7 @@ func GetHomePage(ctx context.Context, req *modelv.PostHomePageReq) (*modelv.Post
 
 // 普通贴
 func getHomePageNormal(ctx context.Context, req *modelv.PostHomePageReq) (*modelv.PostHomePageResp, *constants.Error) {
-	posts, isLastPage, err := mysql.GetPostList(ctx, int(req.PostType), int(req.Page), 10)
+	posts, isLastPage, err := mysql.GetPostList(ctx, int(req.PostType), int(req.Page-1), 10)
 	if err != nil {
 		logs.Errorf(ctx, "GetHomePage GetPostList fail. err=%v", err)
 		return nil, constants.MysqlError
@@ -45,8 +45,8 @@ func getHomePageNormal(ctx context.Context, req *modelv.PostHomePageReq) (*model
 			PostContent: post.Content,
 			CreateTime:  uint64(post.CreateTime),
 		}
-		buildPostAuthor(ctx, data, post.UserId)
-		buildPostAppendInfo(ctx, data, appendInfom, categorym)
+		data = buildPostAuthor(ctx, data, post.UserId)
+		data = buildPostAppendInfo(ctx, data, appendInfom, categorym)
 		datas = append(datas, data)
 	}
 
@@ -89,11 +89,12 @@ func buildPostAuthor(
 	ctx context.Context,
 	data *modelv.PostData,
 	userId int64,
-) {
+) *modelv.PostData {
 	data.Author = &modelv.PostDataAuthor{
 		Uid:  uint64(userId),
 		Name: "哈哈",
 	}
+	return data
 }
 
 // 生成附加信息，目前主要是标签
@@ -102,21 +103,87 @@ func buildPostAppendInfo(
 	data *modelv.PostData,
 	appendInfom map[int64]*modele.AnimePostAppendNormal,
 	categorym map[int]*modelc.PostCategoryCache,
-) {
-	if appendInfo, ok := appendInfom[int64(data.PostId)]; ok {
-		for _, categoryId := range appendInfo.Category {
-			if categoryInfo, ok := categorym[categoryId]; ok {
-				data.PostCategory = append(data.PostCategory, &modelv.PostDataCategory{
-					Id:   uint64(categoryInfo.Id),
-					Name: categoryInfo.Name,
-				})
-			}
+) *modelv.PostData {
+	appendInfo, ok := appendInfom[int64(data.PostId)]
+	if !ok {
+		return data
+	}
+	for _, categoryId := range appendInfo.Category {
+		if categoryInfo, ok := categorym[categoryId]; ok {
+			data.PostCategory = append(data.PostCategory, &modelv.PostDataCategory{
+				Id:   uint64(categoryInfo.Id),
+				Name: categoryInfo.Name,
+			})
 		}
 	}
+
+	return data
 }
 
 // func getHomePageMakeup(ctx context.Context, req *modelv.PostReq) (*modelv.PostResp, *constants.Error)
 
 func CreatePost(ctx context.Context, req *modelv.PostCreateReq, body []byte) *constants.Error {
+	//TODO : AUTH
+	bodyData := &modelv.PostCreateBody{}
+	err := sonic.Unmarshal(body, bodyData)
+	if err != nil {
+		logs.Errorf(ctx, "CreatePost Unmarshal fail. err=%v", err)
+		return constants.InvalidParamsError
+	}
+	if !bodyData.Check(req.PostType) {
+		return constants.InvalidParamsError
+	}
+
+	entity := &modele.AnimePost{
+		PostType: uint8(req.PostType),
+		UserId:   int64(req.Uid),
+		Title:    bodyData.Title,
+		Content:  bodyData.Content,
+		Status:   modele.ANIMEPOST_STATUS_VALID,
+	}
+	// media
+	if len(bodyData.Media) > 0 {
+		media, err := sonic.Marshal(bodyData.Media)
+		if err != nil {
+			return constants.InvalidParamsError
+		}
+		entity.Media = string(media)
+	}
+	// appendInfo
+	if ainfo := getAppendInfo(ctx, req.PostType, bodyData); ainfo != nil {
+		appendInfo, err := sonic.Marshal(ainfo)
+		if err != nil {
+			return constants.InvalidParamsError
+		}
+		entity.AppendInfo = string(appendInfo)
+	}
+
+	err = mysql.CreatePost(ctx, entity)
+	if err != nil {
+		logs.Errorf(ctx, "CreatePost insetDb fail. err=%v", err)
+		return constants.MysqlError
+	}
+
 	return nil
+}
+
+func getAppendInfo(ctx context.Context, postType int, body *modelv.PostCreateBody) interface{} {
+	if body == nil {
+		return nil
+	}
+	switch postType {
+	case modele.ANIMEPOST_TYPE_NORMAL:
+		return modele.AnimePostAppendNormal{
+			Category: body.Category,
+		}
+	case modele.ANIMEPOST_TYPE_MAKEUP:
+		return modele.AnimePostAppendMakeup{
+			Category: body.Category,
+			OnDoor:   body.OnDoor,
+			Price:    body.Price,
+			Locate:   body.Locate,
+		}
+	default:
+		return nil
+	}
 }

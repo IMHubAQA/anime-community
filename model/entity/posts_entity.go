@@ -37,7 +37,10 @@ type AnimePostAppendNormal struct {
 }
 
 type AnimePostAppendMakeup struct {
-	Category []int `json:"category,omitempty"`
+	Category []int   `json:"category,omitempty"`
+	OnDoor   int     `json:"onDoror"`
+	Price    float64 `json:"price"`
+	Locate   string  `json:"locate"`
 }
 
 type AnimePostCategory struct {

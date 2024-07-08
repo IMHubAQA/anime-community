@@ -22,7 +22,6 @@ func splitKeys(curr int, length int) int {
 }
 
 func MutiGet(ctx context.Context, keys []string) (map[string]string, error) {
-	logs.Infof(ctx, "MutiGet info. keys=%v", keys)
 	if len(keys) == 0 {
 		return nil, fmt.Errorf("empty key")
 	}

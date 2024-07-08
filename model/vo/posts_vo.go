@@ -7,7 +7,15 @@ type PostHomePageReq struct {
 	Category uint64 `form:"category"`
 }
 
-// func (req *PostReq) Init()
+func (req *PostHomePageReq) Init() {
+	if req == nil {
+		req = &PostHomePageReq{}
+	}
+	if req.Page == 0 {
+		req.Page = 1
+	}
+}
+
 // func (req *PostReq) Check()
 
 type PostHomePageResp struct {
@@ -47,9 +55,10 @@ type PostDataCategory struct {
 }
 
 type PostCreateReq struct {
-	Uid      string `form:"-"`
+	Uid      int    `form:"-"`
 	UToken   string `form:"-"`
-	PostType string `form:"-"`
+	PostType int    `form:"-"`
+	Sign     string `form:"-"`
 }
 
 type PostCreateBody struct {
@@ -60,4 +69,11 @@ type PostCreateBody struct {
 	OnDoor   int              `json:"onDoror"`
 	Price    float64          `json:"price"`
 	Locate   string           `json:"locate"`
+}
+
+func (b *PostCreateBody) Check(postType int) bool {
+	if b.Title == "" || b.Content == "" || len(b.Category) == 0 {
+		return false
+	}
+	return true
 }

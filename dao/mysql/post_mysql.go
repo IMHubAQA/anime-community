@@ -27,3 +27,11 @@ func GetPostList(ctx context.Context, postType, page, pageSize int) ([]*modele.A
 
 	return resp, len(resp) < pageSize, nil
 }
+
+func CreatePost(ctx context.Context, entity *modele.AnimePost) error {
+	tx := communityClient.Model(&modele.AnimePost{}).Create(entity)
+	if err := tx.Error; err != nil {
+		return err
+	}
+	return nil
+}

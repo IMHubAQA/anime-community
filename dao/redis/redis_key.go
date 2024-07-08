@@ -14,7 +14,13 @@ const (
 	_DEFAULT_EXPIRE = time.Hour * 24 // 一天
 )
 
-var PostCategoryRedisKey = newRedisKey(_REDIS_PREFIX+"pcate", _DEFAULT_EXPIRE*30)
+var (
+	PostCategoryRedisKey = newRedisKey(_REDIS_PREFIX+"pcate", _DEFAULT_EXPIRE*30)
+)
+
+var (
+	PostCreateRouterLockRedisKey = newRedisKey(_REDIS_LOCKPREFIX+"pcrl", time.Second*5)
+)
 
 type RedisKey struct {
 	key    string
