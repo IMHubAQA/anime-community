@@ -1,6 +1,6 @@
 package modelv
 
-type PostReq struct {
+type PostHomePageReq struct {
 	Uid      uint64 `form:"uid"`
 	Page     uint64 `form:"page"`
 	PostType uint64 `form:"postType"`
@@ -10,7 +10,7 @@ type PostReq struct {
 // func (req *PostReq) Init()
 // func (req *PostReq) Check()
 
-type PostResp struct {
+type PostHomePageResp struct {
 	IsLastPage bool        `json:"isLastPage"` // 是否最后一页
 	PostList   []*PostData `json:"postList"`   // 帖子列表
 }
@@ -44,4 +44,20 @@ type PostDataAuthor struct {
 type PostDataCategory struct {
 	Id   uint64 `json:"id"`   // 标签id
 	Name string `json:"name"` // 标签名称
+}
+
+type PostCreateReq struct {
+	Uid      string `form:"-"`
+	UToken   string `form:"-"`
+	PostType string `form:"-"`
+}
+
+type PostCreateBody struct {
+	Title    string           `json:"title"`
+	Content  string           `json:"content"`
+	Media    []*PostDataMedia `json:"media"`
+	Category []int            `json:"category"`
+	OnDoor   int              `json:"onDoror"`
+	Price    float64          `json:"price"`
+	Locate   string           `json:"locate"`
 }
