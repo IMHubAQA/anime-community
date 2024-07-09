@@ -2,6 +2,7 @@ package controller
 
 import (
 	"crypto/sha256"
+	"log"
 	"strconv"
 
 	"anime-community/common/constants"
@@ -17,14 +18,14 @@ type PostsController struct {
 	BaseController
 }
 
-// 首页
-func (c *PostsController) Homepage() {
+// 帖子列表
+func (c *PostsController) List() {
 	ctx := logs.NewTraceContext(c.Ctx.Request.Context())
 	defer helper.Recover(ctx, func() {
 		c.FailJsonResp(constants.ServerError)
 	})
 
-	req := &modelv.PostHomePageReq{}
+	req := &modelv.PostListPistageReq{}
 	err := c.ParseForm(req)
 	if err != nil {
 		logs.Warnf(ctx, "PostsController Homepage ParseForm fail. err=%v", err)
@@ -36,7 +37,7 @@ func (c *PostsController) Homepage() {
 
 	logs.Infof(ctx, "PostsController Homepage req=%+v", req)
 
-	data, err1 := service.GetHomePage(ctx, req)
+	data, err1 := service.GetPostList(ctx, req)
 	if err1 != nil {
 		c.FailJsonResp(err1)
 		return
@@ -60,14 +61,15 @@ func (c *PostsController) Create() {
 	}
 	uid := c.Ctx.Request.Header.Get("uid")
 	req.Uid, _ = strconv.Atoi(uid)
-	req.PostType, _ = strconv.Atoi(c.Ctx.Request.Header.Get("postType"))
 
-	if req.Uid <= 0 || req.PostType <= 0 || req.UToken == "" {
+	if req.Uid <= 0 || req.UToken == "" {
 		c.FailJsonResp(constants.InvalidParamsError)
 		return
 	}
 
-	if !helper.CheckSign(req.Sign, sha256.New(), uid, req.TimeStr) {
+	log.Println(string(c.Ctx.Input.RequestBody))
+
+	if !helper.CheckSign(req.Sign, sha256.New(), uid, req.TimeStr, string(c.Ctx.Input.RequestBody)) {
 		c.FailJsonResp(constants.InvalidSignError)
 		return
 	}

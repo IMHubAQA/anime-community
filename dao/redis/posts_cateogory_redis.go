@@ -7,7 +7,6 @@ import (
 
 	"github.com/bytedance/sonic"
 
-	"anime-community/common/logs"
 	modelc "anime-community/model/cache"
 )
 
@@ -36,7 +35,9 @@ func GetPostsCategory(ctx context.Context, ids []int) (map[int]*modelc.PostCateg
 	keyMap := make(map[string]int)
 	for i, id := range ids {
 		key := PostCategoryRedisKey.GetKey(strconv.Itoa(int(id)))
-		logs.Infof(ctx, "redisekey :=%v", key)
+		if _, ok := keyMap[key]; ok {
+			continue
+		}
 		keys[i] = key
 		keyMap[key] = id
 	}

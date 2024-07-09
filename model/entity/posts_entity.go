@@ -22,25 +22,17 @@ type AnimePost struct {
 	Title      string `json:"title" gorm:"column:title"`                                  // 标题
 	Content    string `json:"content" gorm:"column:content"`                              // 内容
 	Media      string `json:"media" gorm:"column:media"`                                  // 图片/视频
-	AppendInfo string `json:"append_info" gorm:"column:append_info"`                      // 附加信息
 	Status     uint8  `json:"status" gorm:"column:status"`                                //
 	CreateTime int64  `json:"create_time" gorm:"autoCreateTime:milli;column:create_time"` //
 	UpdateTime int64  `json:"update_time" gorm:"autoUpdateTime:milli;column:update_time"` //
+	Ondoor     uint8  `json:"ondoor" gorm:"column:ondoor"`                                // 0 : 不可上门，1：可以
+	Location   string `json:"location" gorm:"column:location"`                            //
+	Price      int64  `json:"price" gorm:"column:price"`                                  //
+	Category   string `json:"category" gorm:"column:category"`                            //
 }
 
 func (a AnimePost) TableName() string {
 	return "anime_post"
-}
-
-type AnimePostAppendNormal struct {
-	Category []int `json:"category,omitempty"`
-}
-
-type AnimePostAppendMakeup struct {
-	Category []int   `json:"category,omitempty"`
-	OnDoor   int     `json:"onDoror"`
-	Price    float64 `json:"price"`
-	Locate   string  `json:"locate"`
 }
 
 type AnimePostCategory struct {

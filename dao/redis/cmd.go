@@ -37,7 +37,7 @@ func MutiGet(ctx context.Context, keys []string) (map[string]string, error) {
 		offset = netxOffset
 
 		cmders, err := pipe.Exec(ctx)
-		if err != nil {
+		if err != nil && err != goRedis.Nil {
 			logs.Infof(ctx, "MutiGet fail. err=%v", err)
 			continue
 		}
