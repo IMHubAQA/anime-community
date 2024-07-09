@@ -17,6 +17,6 @@ func initRouter(prefix string) {
 	ns.Router("/test", &controller.TestController{}, "get:Get")
 
 	ns.Router("/post/homepage", &controller.PostsController{}, "get:Homepage")
-	ns.Router("/post/create", &controller.PostsController{}, "get:Create")
+	ns.Router("/post/create", &controller.PostsController{}, "post:Create")
 	web.AddNamespace(ns)
 }

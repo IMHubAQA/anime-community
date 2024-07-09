@@ -4,6 +4,7 @@ import (
 	"anime-community/config"
 	"context"
 	"sync"
+	"time"
 
 	"anime-community/common/logs"
 
@@ -26,8 +27,15 @@ func newRedisClient() *goRedis.ClusterClient {
 		panic("load redis config fail")
 	}
 	return goRedis.NewClusterClient(&goRedis.ClusterOptions{
-		Addrs:    config.GetServerConfig().RedisConfig.Addr,
-		Password: config.GetServerConfig().RedisConfig.PassWord,
+		Addrs:        config.GetServerConfig().RedisConfig.Addr,
+		Password:     config.GetServerConfig().RedisConfig.PassWord,
+		MinIdleConns: 10,
+		PoolSize:     15,
+
+		DialTimeout:  time.Second * 5,
+		ReadTimeout:  time.Second * 3,
+		WriteTimeout: time.Second * 3,
+		PoolTimeout:  time.Second * 4,
 	})
 }
 

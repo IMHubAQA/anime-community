@@ -1,9 +1,11 @@
 package controller
 
 import (
+	"crypto/sha256"
 	"strconv"
 
 	"anime-community/common/constants"
+	"anime-community/common/helper"
 	"anime-community/common/httpc"
 	"anime-community/common/logs"
 	"anime-community/dao/redis"
@@ -18,6 +20,10 @@ type PostsController struct {
 // 首页
 func (c *PostsController) Homepage() {
 	ctx := logs.NewTraceContext(c.Ctx.Request.Context())
+	defer helper.Recover(ctx, func() {
+		c.FailJsonResp(constants.ServerError)
+	})
+
 	req := &modelv.PostHomePageReq{}
 	err := c.ParseForm(req)
 	if err != nil {
@@ -43,15 +49,26 @@ func (c *PostsController) Homepage() {
 // 创建帖子
 func (c *PostsController) Create() {
 	ctx := logs.NewTraceContext(c.Ctx.Request.Context())
+	defer helper.Recover(ctx, func() {
+		c.FailJsonResp(constants.ServerError)
+	})
+
 	req := &modelv.PostCreateReq{
-		UToken: c.Ctx.Request.Header.Get("uToken"),
-		//Sign:     c.Ctx.Request.Header.Get("sign"),
+		UToken:  c.Ctx.Request.Header.Get("uToken"),
+		Sign:    c.Ctx.Request.Header.Get("sign"),
+		TimeStr: c.Ctx.Request.Header.Get("timeStr"),
 	}
 	uid := c.Ctx.Request.Header.Get("uid")
 	req.Uid, _ = strconv.Atoi(uid)
 	req.PostType, _ = strconv.Atoi(c.Ctx.Request.Header.Get("postType"))
+
 	if req.Uid <= 0 || req.PostType <= 0 || req.UToken == "" {
 		c.FailJsonResp(constants.InvalidParamsError)
+		return
+	}
+
+	if !helper.CheckSign(req.Sign, sha256.New(), uid, req.TimeStr) {
+		c.FailJsonResp(constants.InvalidSignError)
 		return
 	}
 
@@ -70,6 +87,7 @@ func (c *PostsController) Create() {
 		redis.UnLock(ctx, routerLock, uid)
 		return
 	}
+
 	c.JsonResp(httpc.OkNoData)
 	redis.UnLock(ctx, routerLock, uid)
 }

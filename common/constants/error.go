@@ -16,6 +16,7 @@ var (
 	RdisError          = newError(10003, "缓存失败")
 	NoSupportError     = newError(10004, "功能不支持")
 	InvalidParamsError = newError(10005, "非法参数")
+	InvalidSignError   = newError(10006, "非法签名")
 )
 
 func newError(code int, msg string) *Error {

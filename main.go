@@ -35,7 +35,7 @@ func InitServer(ctx context.Context) {
 	}
 
 	logs.Infof(ctx, "[%v:%v] starting......", web.BConfig.AppName, web.BConfig.Listen.HTTPPort)
-
+	web.BConfig.CopyRequestBody = true
 	task.Init()
 	router.Init()
 }

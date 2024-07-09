@@ -7,17 +7,23 @@ import (
 )
 
 func OnLock(ctx context.Context, key *RedisKey, suffixs ...string) bool {
-	err := GetCommunityClient().SetNX(ctx, key.GetKey(suffixs...), 1, key.GetExpire()).Err()
-	if err != nil {
-		logs.Warnf(ctx, "OnLock fail. err=%v", err)
+	rediskey := key.GetKey(suffixs...)
+	ok, err := GetCommunityClient().SetNX(ctx, rediskey, 1, key.GetExpire()).Result()
+	if err != nil || !ok {
+		logs.Warnf(ctx, "OnLock fail. key=%v err=%v", rediskey, err)
+		return false
 	}
-	return err == nil
+	logs.Infof(ctx, "OnLock success. key=%v", rediskey)
+	return true
 }
 
 func UnLock(ctx context.Context, key *RedisKey, suffixs ...string) bool {
-	err := GetCommunityClient().Del(ctx, key.GetKey(suffixs...)).Err()
+	rediskey := key.GetKey(suffixs...)
+	_, err := GetCommunityClient().Del(ctx, rediskey).Result()
 	if err != nil {
-		logs.Warnf(ctx, "UnLock fail. err=%v", err)
+		logs.Warnf(ctx, "UnLock fail. key=%v err=%v", rediskey, err)
+		return false
 	}
-	return err == nil
+	logs.Infof(ctx, "UnLock success.%v", rediskey)
+	return true
 }

@@ -24,17 +24,23 @@ type PostHomePageResp struct {
 }
 
 type PostData struct {
-	PostId       uint64              `json:"postId"`          // 帖子id
-	PostType     uint64              `json:"postType"`        // 帖子类型
-	PostTitle    string              `json:"postTitle"`       // 标题
-	PostContent  string              `json:"postContent"`     // 内容
-	Media        []*PostDataMedia    `json:"media,omitempty"` // 图片、视频
-	Author       *PostDataAuthor     `json:"author"`          // 作者
-	PostCategory []*PostDataCategory `json:"postCategory"`    // 标签
-	LikeCnt      uint64              `json:"LikeCnt"`         // 点赞
-	ReplyCnt     uint64              `json:"ReplyCnt"`        // 回复
-	CollectCnt   uint64              `json:"collectCnt"`      // 收藏
-	CreateTime   uint64              `json:"createTime"`      // 时间
+	PostId      uint64           `json:"postId"`          // 帖子id
+	PostType    uint64           `json:"postType"`        // 帖子类型
+	PostTitle   string           `json:"postTitle"`       // 标题
+	PostContent string           `json:"postContent"`     // 内容
+	Media       []*PostDataMedia `json:"media,omitempty"` // 图片、视频
+	Author      *PostDataAuthor  `json:"author"`          // 作者
+	LikeCnt     uint64           `json:"LikeCnt"`         // 点赞
+	ReplyCnt    uint64           `json:"ReplyCnt"`        // 回复
+	CollectCnt  uint64           `json:"collectCnt"`      // 收藏
+	CreateTime  uint64           `json:"createTime"`      // 时间
+	AppendInfo  interface{}      `json:"appendInfo"`
+}
+type PostAppendInfo struct {
+	Category []*PostDataCategory `json:"category"` // 标签
+	OnDoor   int                 `json:"onDoror,omitempty"`
+	Price    float64             `json:"price,omitempty"`
+	Locate   string              `json:"locate,omitempty"`
 }
 
 type PostDataMedia struct {
@@ -59,6 +65,7 @@ type PostCreateReq struct {
 	UToken   string `form:"-"`
 	PostType int    `form:"-"`
 	Sign     string `form:"-"`
+	TimeStr  string `form:"-"`
 }
 
 type PostCreateBody struct {
