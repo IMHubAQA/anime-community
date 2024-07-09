@@ -1,5 +1,7 @@
 package modelv
 
+import modele "anime-community/model/entity"
+
 type PostListPistageReq struct {
 	// Uid      uint64 `form:"uid"`
 	Page     uint64 `form:"page"`
@@ -75,7 +77,13 @@ type PostCreateBody struct {
 	Location string           `json:"location"` // 地址
 }
 
-func (b *PostCreateBody) Check(postType int) bool {
+func (b *PostCreateBody) Check() bool {
+	if b == nil {
+		return false
+	}
+	if _, ok := modele.ANIMEPOST_TYPE_SET[b.PostType]; !ok {
+		return false
+	}
 	if b.Title == "" || b.Content == "" || len(b.Category) == 0 {
 		return false
 	}

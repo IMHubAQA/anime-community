@@ -104,7 +104,7 @@ func CreatePost(ctx context.Context, req *modelv.PostCreateReq, body []byte) *co
 		logs.Errorf(ctx, "CreatePost Unmarshal fail. body=%v err=%v", string(body), err)
 		return constants.InvalidParamsError
 	}
-	if !bodyData.Check(bodyData.PostType) {
+	if !bodyData.Check() {
 		return constants.InvalidParamsError
 	}
 
