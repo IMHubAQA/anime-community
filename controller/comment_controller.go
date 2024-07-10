@@ -10,30 +10,29 @@ import (
 	"anime-community/service"
 )
 
-type PostsController struct {
+type CommentController struct {
 	BaseController
 }
 
-// 帖子列表
-func (c *PostsController) List() {
+func (c *CommentController) List() {
 	ctx := logs.NewTraceContext(c.Ctx.Request.Context())
 	defer helper.Recover(ctx, func() {
 		c.FailJsonResp(constants.ServerError)
 	})
 
-	req := &modelv.PostListReq{}
+	req := &modelv.CommentListReq{}
 	err := c.ParseForm(req)
 	if err != nil {
-		logs.Warnf(ctx, "PostsController List ParseForm fail. err=%v", err)
+		logs.Warnf(ctx, "CommentController List ParseForm fail. err=%v", err)
 		c.FailJsonResp(constants.InvalidParamsError)
 		return
 	}
 
 	req.Init()
 
-	logs.Infof(ctx, "PostsController List req=%+v", req)
+	logs.Infof(ctx, "CommentController List req=%+v", req)
 
-	data, err1 := service.GetPostList(ctx, req)
+	data, err1 := service.GetCommentList(ctx, req)
 	if err1 != nil {
 		c.FailJsonResp(err1)
 		return
@@ -43,8 +42,7 @@ func (c *PostsController) List() {
 	c.JsonResp(resp)
 }
 
-// 创建帖子
-func (c *PostsController) Create() {
+func (c *CommentController) Create() {
 	ctx := logs.NewTraceContext(c.Ctx.Request.Context())
 	defer helper.Recover(ctx, func() {
 		c.FailJsonResp(constants.ServerError)
@@ -55,16 +53,16 @@ func (c *PostsController) Create() {
 		return
 	}
 
-	logs.Infof(ctx, "PostsController Create header=%+v", header)
+	logs.Infof(ctx, "CommentController Create header=%+v", header)
 
 	// 防止重复提交
-	routerLock := redis.PostCreateRouterLockRedisKey
+	routerLock := redis.CommentCreateRouterLockRedisKey
 	if !redis.OnLock(ctx, routerLock, header.Uid) {
 		c.FailJsonResp(constants.ServerError)
 		return
 	}
 
-	err = service.CreatePost(ctx, header, c.Ctx.Input.RequestBody)
+	err = service.CreateComment(ctx, header, c.Ctx.Input.RequestBody)
 	if err != nil {
 		c.FailJsonResp(err)
 		redis.UnLock(ctx, routerLock, header.Uid)
@@ -73,30 +71,4 @@ func (c *PostsController) Create() {
 
 	c.JsonResp(httpc.OkNoData)
 	redis.UnLock(ctx, routerLock, header.Uid)
-}
-
-func (c *PostsController) Info() {
-	ctx := logs.NewTraceContext(c.Ctx.Request.Context())
-	defer helper.Recover(ctx, func() {
-		c.FailJsonResp(constants.ServerError)
-	})
-
-	req := &modelv.PostInfoReq{}
-	err := c.ParseForm(req)
-	if err != nil || !req.Check() {
-		logs.Warnf(ctx, "PostsController Info ParseForm fail. err=%v", err)
-		c.FailJsonResp(constants.InvalidParamsError)
-		return
-	}
-
-	logs.Infof(ctx, "PostsController Info req=%+v", req)
-
-	data, err1 := service.GetPostById(ctx, req)
-	if err1 != nil {
-		c.FailJsonResp(err1)
-		return
-	}
-
-	resp := httpc.NewHttpResult().OkWithData(data).Build()
-	c.JsonResp(resp)
 }

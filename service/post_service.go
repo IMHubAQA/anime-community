@@ -13,11 +13,48 @@ import (
 	modelv "anime-community/model/vo"
 )
 
-// 获取贴子列表
-func GetPostList(ctx context.Context, req *modelv.PostListPistageReq) (*modelv.PostListPageResp, *constants.Error) {
-	posts, isLastPage, err := mysql.GetPostList(ctx, int(req.PostType), int(req.Page-1), 10)
+func buildPostData(ctx context.Context, post *modele.AnimePost) *modelv.PostData {
+	data := &modelv.PostData{
+		PostId:      uint64(post.Id),
+		PostType:    uint64(post.PostType),
+		PostTitle:   post.Title,
+		PostContent: post.Content,
+		OnDoor:      int(post.Ondoor),
+		Price:       float64(post.Price),
+		Location:    post.Location,
+		CreateTime:  uint64(post.CreateTime),
+	}
+	media := []*modelv.MediaData{}
+	if err := sonic.Unmarshal([]byte(post.Media), &media); err == nil {
+		data.Media = media
+	}
+	if commentCnt, err := redis.GetCommentCount(ctx, modele.ANIMECOMMENT_REPLYTYPE_POST, int(data.PostId)); err != nil {
+		data.ReplyCnt = uint64(commentCnt)
+	}
+	return data
+}
+
+// 通过帖子id获取帖子信息
+func GetPostById(ctx context.Context, req *modelv.PostInfoReq) (*modelv.PostData, *constants.Error) {
+	post, err := mysql.GetPostById(ctx, req.PostId)
 	if err != nil {
-		logs.Errorf(ctx, "GetHomePage GetPostList fail. err=%v", err)
+		logs.Errorf(ctx, "GetPostById GetPostById fail. err=%v", err)
+		return nil, constants.MysqlError
+	}
+
+	categorym := getCategoryInfo(ctx, []*modele.AnimePost{post})
+
+	data := buildPostData(ctx, post)
+	data.Category = categorym[int64(post.Id)]
+	data = buildPostAuthor(ctx, data, post.UserId)
+	return data, nil
+}
+
+// 获取贴子列表
+func GetPostList(ctx context.Context, req *modelv.PostListReq) (*modelv.PostListResp, *constants.Error) {
+	posts, isLastPage, err := mysql.GetPostList(ctx, int(req.PostType), int(req.Page-1), req.PageSize)
+	if err != nil {
+		logs.Errorf(ctx, "GetPostList GetPostList fail. err=%v", err)
 		return nil, constants.MysqlError
 	}
 
@@ -25,22 +62,13 @@ func GetPostList(ctx context.Context, req *modelv.PostListPistageReq) (*modelv.P
 
 	datas := []*modelv.PostData{}
 	for _, post := range posts {
-		data := &modelv.PostData{
-			PostId:      uint64(post.Id),
-			PostType:    req.PostType,
-			PostTitle:   post.Title,
-			PostContent: post.Content,
-			OnDoor:      int(post.Ondoor),
-			Price:       float64(post.Price),
-			Location:    post.Location,
-			CreateTime:  uint64(post.CreateTime),
-		}
+		data := buildPostData(ctx, post)
+		data.Category = categorym[int64(post.Id)]
 		data = buildPostAuthor(ctx, data, post.UserId)
-		data.Category = categorym[int64(data.PostId)]
 		datas = append(datas, data)
 	}
 
-	return &modelv.PostListPageResp{
+	return &modelv.PostListResp{
 		IsLastPage: isLastPage,
 		PostList:   datas,
 	}, nil
@@ -89,14 +117,14 @@ func buildPostAuthor(
 	data *modelv.PostData,
 	userId int64,
 ) *modelv.PostData {
-	data.Author = &modelv.PostDataAuthor{
+	data.Author = &modelv.AuthorData{
 		Uid:  uint64(userId),
 		Name: "哈哈",
 	}
 	return data
 }
 
-func CreatePost(ctx context.Context, req *modelv.PostCreateReq, body []byte) *constants.Error {
+func CreatePost(ctx context.Context, req *modelv.BaseHeader, body []byte) *constants.Error {
 	//TODO: AUTH
 	bodyData := &modelv.PostCreateBody{}
 	err := sonic.Unmarshal(body, bodyData)

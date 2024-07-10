@@ -35,3 +35,16 @@ func CreatePost(ctx context.Context, entity *modele.AnimePost) error {
 	}
 	return nil
 }
+
+// 通过帖子id获取帖子信息
+func GetPostById(ctx context.Context, postId uint64) (*modele.AnimePost, error) {
+	tx := communityClient
+	resp := &modele.AnimePost{}
+	tx.Model(&modele.AnimePost{}).
+		Where("id = ? and status = ?", postId, modele.ANIMEPOST_STATUS_VALID).
+		Find(&resp)
+	if tx.Error != nil {
+		return nil, tx.Error
+	}
+	return resp, nil
+}

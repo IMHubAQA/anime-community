@@ -1,7 +1,7 @@
 package redis
 
 import (
-	"bytes"
+	"fmt"
 	"time"
 )
 
@@ -16,10 +16,12 @@ const (
 
 var (
 	PostCategoryRedisKey = newRedisKey(_REDIS_PREFIX+"pcate", _DEFAULT_EXPIRE*30)
+	CommentCountRedisKey = newRedisKey(_REDIS_PREFIX+"ccnt", _DEFAULT_EXPIRE*365)
 )
 
 var (
-	PostCreateRouterLockRedisKey = newRedisKey(_REDIS_LOCKPREFIX+"pcrl", time.Second*5)
+	PostCreateRouterLockRedisKey    = newRedisKey(_REDIS_LOCKPREFIX+"pcrl", time.Second*5)
+	CommentCreateRouterLockRedisKey = newRedisKey(_REDIS_LOCKPREFIX+"ccrl", time.Second*5)
 )
 
 type RedisKey struct {
@@ -34,17 +36,15 @@ func newRedisKey(key string, expire time.Duration) *RedisKey {
 	}
 }
 
-func (rk *RedisKey) GetKey(suffixs ...string) string {
+func (rk *RedisKey) GetKey(suffixs ...interface{}) string {
 	if rk == nil {
 		return ""
 	}
-	var bf bytes.Buffer
-	bf.WriteString(rk.key)
+	key := rk.key
 	for _, suffix := range suffixs {
-		bf.WriteString(":")
-		bf.WriteString(suffix)
+		key = fmt.Sprintf("%v:%v", key, suffix)
 	}
-	return bf.String()
+	return key
 }
 
 func (rk *RedisKey) GetExpire() time.Duration {

@@ -3,7 +3,6 @@ package redis
 import (
 	"context"
 	"fmt"
-	"strconv"
 
 	"github.com/bytedance/sonic"
 
@@ -18,7 +17,7 @@ func SetPostsCategory(ctx context.Context, cacheValues []*modelc.PostCategoryCac
 	keys, values := make([]string, len(cacheValues)), make([]string, len(cacheValues))
 
 	for i, cacheValue := range cacheValues {
-		keys[i] = PostCategoryRedisKey.GetKey(strconv.Itoa(int(cacheValue.Id)))
+		keys[i] = PostCategoryRedisKey.GetKey(cacheValue.Id)
 		b, _ := sonic.Marshal(cacheValue)
 		values[i] = string(b)
 	}
@@ -34,7 +33,7 @@ func GetPostsCategory(ctx context.Context, ids []int) (map[int]*modelc.PostCateg
 	keys := make([]string, len(ids))
 	keyMap := make(map[string]int)
 	for i, id := range ids {
-		key := PostCategoryRedisKey.GetKey(strconv.Itoa(int(id)))
+		key := PostCategoryRedisKey.GetKey(id)
 		if _, ok := keyMap[key]; ok {
 			continue
 		}
