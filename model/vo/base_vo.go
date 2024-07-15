@@ -28,11 +28,11 @@ func GetAndCheckBaseHeader(ctx context.Context, beegoCtx *beegoctx.Context) (*Ba
 	header.Uid, _ = strconv.Atoi(uid)
 
 	if header.Uid <= 0 || header.UToken == "" {
-		return nil, constants.InvalidParamsError
+		return nil, constants.NewErrorWithMsg("invalid uid or token")
 
 	}
 
-	if !helper.CheckSign(header.Sign, sha256.New(), uid, header.TimeStr, string(beegoCtx.Input.RequestBody)) {
+	if !helper.CheckSign(ctx, header.Sign, sha256.New(), uid, header.TimeStr, string(beegoCtx.Input.RequestBody)) {
 		return nil, constants.InvalidSignError
 	}
 	return header, nil

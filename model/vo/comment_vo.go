@@ -5,8 +5,8 @@ import modele "anime-community/model/entity"
 type CommentListReq struct {
 	Page uint64 `form:"page"`
 	// PostId    uint64 `form:"postId"`    // 帖子id
-	RelayType uint64 `form:"relayType"` // 回复类型：1: 帖子，2：评论
-	RelayId   uint64 `form:"relayId"`   // 回复类型id
+	ReplyType uint64 `form:"replyType"` // 回复类型：1: 帖子，2：评论
+	ReplyId   uint64 `form:"replyId"`   // 回复类型id
 
 	PageSize int `form:"-"`
 }
@@ -23,7 +23,7 @@ func (r *CommentListReq) Init() {
 
 type CommentListResp struct {
 	IsLastPage  bool           `json:"isLastPage"`  // 是否最后一页
-	CommentList []*CommentData `json:"CommentList"` // 帖子列表
+	CommentList []*CommentData `json:"commentList"` // 帖子列表
 }
 
 type CommentData struct {

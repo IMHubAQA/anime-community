@@ -16,7 +16,7 @@ import (
 
 // 评论列表
 func GetCommentList(ctx context.Context, req *modelv.CommentListReq) (*modelv.CommentListResp, *constants.Error) {
-	commentList, err := mysql.GetCommentByReplyType(ctx, int(req.RelayId), int(req.RelayType), int(req.Page)-1, req.PageSize)
+	commentList, err := mysql.GetCommentByReplyType(ctx, int(req.ReplyType), int(req.ReplyId), int(req.Page)-1, req.PageSize)
 	if err != nil {
 		logs.Errorf(ctx, "GetCommentList GetCommentByReplyType. err=%v", err)
 		return nil, constants.MysqlError
@@ -33,8 +33,8 @@ func GetCommentList(ctx context.Context, req *modelv.CommentListReq) (*modelv.Co
 			CreateTime: uint64(comment.CreateTime),
 			PostId:     uint64(comment.PostId),
 		}
-		if req.RelayType == modele.ANIMECOMMENT_REPLYTYPE_POST {
-			if commentCnt, err := redis.GetCommentCount(ctx, modele.ANIMECOMMENT_REPLYTYPE_COMMENT, int(comment.Id)); err != nil {
+		if req.ReplyType == modele.ANIMECOMMENT_REPLYTYPE_POST {
+			if commentCnt, err := redis.GetCommentCount(ctx, modele.ANIMECOMMENT_REPLYTYPE_COMMENT, int(comment.Id)); err == nil {
 				data.ReplyCnt = uint64(commentCnt)
 			}
 		}
@@ -52,10 +52,10 @@ func CreateComment(ctx context.Context, req *modelv.BaseHeader, body []byte) *co
 	err := sonic.Unmarshal(body, bodyData)
 	if err != nil {
 		logs.Errorf(ctx, "CreateComment Unmarshal fail. body=%v err=%v", string(body), err)
-		return constants.InvalidParamsError
+		return constants.NewErrorWithMsg("invalid jsondata")
 	}
 	if !bodyData.Check() {
-		return constants.InvalidParamsError
+		return constants.NewErrorWithMsg("invalid jsondata")
 	}
 	entity := &modele.AnimeComment{
 		Content:      bodyData.Content,

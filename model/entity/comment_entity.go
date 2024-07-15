@@ -11,13 +11,17 @@ const (
 )
 
 type AnimeComment struct {
-	Id           int64  `json:"id" gorm:"column:id"`                         //
-	Content      string `json:"content" gorm:"column:content"`               // 内容
-	UserId       int64  `json:"user_id" gorm:"column:user_id"`               // 回复者id
-	PostId       int64  `json:"post_id" gorm:"column:post_id"`               // 帖子id
-	ReplyType    uint8  `json:"reply_type" gorm:"column:reply_type"`         // 回复类型
-	ReplyId      int64  `json:"reply_id" gorm:"column:reply_id"`             // 回复类型id
-	TargetUserId int64  `json:"target_user_id" gorm:"column:target_user_id"` // 回复用户id
-	Status       uint8  `json:"status" gorm:"column:status"`                 //
-	CreateTime   int64  `json:"create_time" gorm:"column:create_time"`       //
+	Id           int64  `json:"id" gorm:"column:id"`                                        //
+	Content      string `json:"content" gorm:"column:content"`                              // 内容
+	UserId       int64  `json:"user_id" gorm:"column:user_id"`                              // 回复者id
+	PostId       int64  `json:"post_id" gorm:"column:post_id"`                              // 帖子id
+	ReplyType    uint8  `json:"reply_type" gorm:"column:reply_type"`                        // 回复类型
+	ReplyId      int64  `json:"reply_id" gorm:"column:reply_id"`                            // 回复类型id
+	TargetUserId int64  `json:"target_user_id" gorm:"column:target_user_id"`                // 回复用户id
+	Status       uint8  `json:"status" gorm:"column:status"`                                //
+	CreateTime   int64  `json:"create_time" gorm:"autoCreateTime:milli;column:create_time"` //
+}
+
+func (a AnimeComment) TableName() string {
+	return "anime_comment"
 }

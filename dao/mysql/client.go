@@ -5,11 +5,10 @@ import (
 	"fmt"
 	"sync"
 
-	"anime-community/common/logs"
-
 	gomysql "gorm.io/driver/mysql"
 	"gorm.io/gorm"
 
+	"anime-community/common/logs"
 	"anime-community/config"
 )
 

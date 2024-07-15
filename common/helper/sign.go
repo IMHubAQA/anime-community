@@ -1,13 +1,19 @@
 package helper
 
 import (
+	"anime-community/common/logs"
+	"context"
 	"encoding/hex"
 	"hash"
 )
 
-func CheckSign(sign string, hashFunc hash.Hash, params ...string) bool {
+func CheckSign(ctx context.Context, sign string, hashFunc hash.Hash, params ...string) bool {
 	for _, param := range params {
 		hashFunc.Write([]byte(param))
 	}
-	return sign == hex.EncodeToString(hashFunc.Sum(nil))
+	validSign := hex.EncodeToString(hashFunc.Sum(nil))
+	if sign != validSign {
+		logs.Infof(ctx, "CheckSign fail. sign=%v validSign=%v", sign, validSign)
+	}
+	return sign == validSign
 }

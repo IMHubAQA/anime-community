@@ -28,7 +28,7 @@ func buildPostData(ctx context.Context, post *modele.AnimePost) *modelv.PostData
 	if err := sonic.Unmarshal([]byte(post.Media), &media); err == nil {
 		data.Media = media
 	}
-	if commentCnt, err := redis.GetCommentCount(ctx, modele.ANIMECOMMENT_REPLYTYPE_POST, int(data.PostId)); err != nil {
+	if commentCnt, err := redis.GetCommentCount(ctx, modele.ANIMECOMMENT_REPLYTYPE_POST, int(data.PostId)); err == nil {
 		data.ReplyCnt = uint64(commentCnt)
 	}
 	return data
