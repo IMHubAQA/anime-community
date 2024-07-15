@@ -2,8 +2,7 @@ package service
 
 import (
 	"context"
-
-	"github.com/bytedance/sonic"
+	"encoding/json"
 
 	"anime-community/common/constants"
 	"anime-community/common/logs"
@@ -25,7 +24,7 @@ func buildPostData(ctx context.Context, post *modele.AnimePost) *modelv.PostData
 		CreateTime:  uint64(post.CreateTime),
 	}
 	media := []*modelv.MediaData{}
-	if err := sonic.Unmarshal([]byte(post.Media), &media); err == nil {
+	if err := json.Unmarshal([]byte(post.Media), &media); err == nil {
 		data.Media = media
 	}
 	if commentCnt, err := redis.GetCommentCount(ctx, modele.ANIMECOMMENT_REPLYTYPE_POST, int(data.PostId)); err == nil {
@@ -83,7 +82,7 @@ func getCategoryInfo(
 	postcIdMap := make(map[int64][]int)
 	for _, post := range posts {
 		category := []int{}
-		err := sonic.Unmarshal([]byte(post.Category), &category)
+		err := json.Unmarshal([]byte(post.Category), &category)
 		if err != nil {
 			continue
 		}
@@ -127,7 +126,7 @@ func buildPostAuthor(
 func CreatePost(ctx context.Context, req *modelv.BaseHeader, body []byte) *constants.Error {
 	//TODO: AUTH
 	bodyData := &modelv.PostCreateBody{}
-	err := sonic.Unmarshal(body, bodyData)
+	err := json.Unmarshal(body, bodyData)
 	if err != nil {
 		logs.Errorf(ctx, "CreatePost Unmarshal fail. body=%v err=%v", string(body), err)
 		return constants.InvalidParamsError
@@ -148,7 +147,7 @@ func CreatePost(ctx context.Context, req *modelv.BaseHeader, body []byte) *const
 	}
 	// category
 	if len(bodyData.Category) > 0 {
-		category, err := sonic.Marshal(bodyData.Category)
+		category, err := json.Marshal(bodyData.Category)
 		if err != nil {
 			return constants.InvalidParamsError
 		}
@@ -156,7 +155,7 @@ func CreatePost(ctx context.Context, req *modelv.BaseHeader, body []byte) *const
 	}
 	// media
 	if len(bodyData.Media) > 0 {
-		media, err := sonic.Marshal(bodyData.Media)
+		media, err := json.Marshal(bodyData.Media)
 		if err != nil {
 			return constants.InvalidParamsError
 		}

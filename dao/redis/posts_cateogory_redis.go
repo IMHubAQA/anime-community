@@ -2,9 +2,8 @@ package redis
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
-
-	"github.com/bytedance/sonic"
 
 	modelc "anime-community/model/cache"
 )
@@ -18,7 +17,7 @@ func SetPostsCategory(ctx context.Context, cacheValues []*modelc.PostCategoryCac
 
 	for i, cacheValue := range cacheValues {
 		keys[i] = PostCategoryRedisKey.GetKey(cacheValue.Id)
-		b, _ := sonic.Marshal(cacheValue)
+		b, _ := json.Marshal(cacheValue)
 		values[i] = string(b)
 	}
 
@@ -48,7 +47,7 @@ func GetPostsCategory(ctx context.Context, ids []int) (map[int]*modelc.PostCateg
 	res := make(map[int]*modelc.PostCategoryCache)
 	for key, value := range m {
 		pcc := &modelc.PostCategoryCache{}
-		err := sonic.Unmarshal([]byte(value), pcc)
+		err := json.Unmarshal([]byte(value), pcc)
 		if err != nil {
 			continue
 		}

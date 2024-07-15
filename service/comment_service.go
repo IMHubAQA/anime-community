@@ -2,8 +2,7 @@ package service
 
 import (
 	"context"
-
-	"github.com/bytedance/sonic"
+	"encoding/json"
 
 	"anime-community/common/constants"
 	"anime-community/common/helper"
@@ -49,7 +48,7 @@ func GetCommentList(ctx context.Context, req *modelv.CommentListReq) (*modelv.Co
 // 创建评论
 func CreateComment(ctx context.Context, req *modelv.BaseHeader, body []byte) *constants.Error {
 	bodyData := &modelv.CommentCreateJsonBody{}
-	err := sonic.Unmarshal(body, bodyData)
+	err := json.Unmarshal(body, bodyData)
 	if err != nil {
 		logs.Errorf(ctx, "CreateComment Unmarshal fail. body=%v err=%v", string(body), err)
 		return constants.NewErrorWithMsg("invalid jsondata")
