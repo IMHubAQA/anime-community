@@ -15,9 +15,10 @@ const (
 )
 
 type ServerConfig struct {
-	LogConfig   *LogConfig   `yaml:"logConfig"`
-	MysqlConfig *MysqlConfig `yaml:"mysqlConfig"`
-	RedisConfig *RedisConfig `yaml:"redisConfig"`
+	LogConfig     *LogConfig     `yaml:"logConfig"`
+	MysqlConfig   *MysqlConfig   `yaml:"mysqlConfig"`
+	RedisConfig   *RedisConfig   `yaml:"redisConfig"`
+	ElasticConfig *ElasticConfig `yaml:"elasticConfig"`
 }
 
 type LogConfig struct {
@@ -38,6 +39,10 @@ type MysqlConfig struct {
 type RedisConfig struct {
 	Addr     []string `yaml:"addr"`
 	PassWord string   `yaml:"passWord"`
+}
+
+type ElasticConfig struct {
+	Addr []string `yaml:"addr"`
 }
 
 var serverConf *ServerConfig

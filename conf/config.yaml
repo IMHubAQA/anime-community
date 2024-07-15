@@ -22,3 +22,7 @@ redisConfig:
     - 120.55.188.192:7005
     - 120.55.188.192:7006
   passWord:
+
+elasticConfig:
+  addr:
+    - http://120.55.188.192:9200
