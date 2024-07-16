@@ -1,6 +1,9 @@
 package modelv
 
-import modele "anime-community/model/entity"
+import (
+	modele "anime-community/model/entity"
+	"fmt"
+)
 
 type PostListReq struct {
 	// Uid      uint64 `form:"uid"`
@@ -60,17 +63,17 @@ type PostCreateBody struct {
 	Location string       `json:"location"` // 地址
 }
 
-func (b *PostCreateBody) Check() bool {
+func (b *PostCreateBody) Check() error {
 	if b == nil {
-		return false
+		return fmt.Errorf("nil body")
 	}
 	if _, ok := modele.ANIMEPOST_TYPE_SET[b.PostType]; !ok {
-		return false
+		return fmt.Errorf("非法帖子类型")
 	}
 	if b.Title == "" || b.Content == "" || len(b.Category) == 0 {
-		return false
+		return fmt.Errorf("标题、内容、标签不能为空")
 	}
-	return true
+	return nil
 }
 
 type PostInfoReq struct {

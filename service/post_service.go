@@ -129,10 +129,10 @@ func CreatePost(ctx context.Context, req *modelv.BaseHeader, body []byte) *const
 	err := json.Unmarshal(body, bodyData)
 	if err != nil {
 		logs.Errorf(ctx, "CreatePost Unmarshal fail. body=%v err=%v", string(body), err)
-		return constants.InvalidParamsError
+		return constants.NewErrorWithMsg(err.Error())
 	}
-	if !bodyData.Check() {
-		return constants.InvalidParamsError
+	if err := bodyData.Check(); err != nil {
+		return constants.NewErrorWithMsg(err.Error())
 	}
 
 	entity := &modele.AnimePost{
@@ -149,7 +149,7 @@ func CreatePost(ctx context.Context, req *modelv.BaseHeader, body []byte) *const
 	if len(bodyData.Category) > 0 {
 		category, err := json.Marshal(bodyData.Category)
 		if err != nil {
-			return constants.InvalidParamsError
+			return constants.NewErrorWithMsg(err.Error())
 		}
 		entity.Category = string(category)
 	}

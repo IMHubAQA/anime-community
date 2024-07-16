@@ -51,7 +51,7 @@ func CreateComment(ctx context.Context, req *modelv.BaseHeader, body []byte) *co
 	err := json.Unmarshal(body, bodyData)
 	if err != nil {
 		logs.Errorf(ctx, "CreateComment Unmarshal fail. body=%v err=%v", string(body), err)
-		return constants.NewErrorWithMsg("invalid jsondata")
+		return constants.NewErrorWithMsg(err.Error())
 	}
 	if !bodyData.Check() {
 		return constants.NewErrorWithMsg("invalid jsondata")
