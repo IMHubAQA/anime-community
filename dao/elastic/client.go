@@ -1,12 +1,13 @@
 package elastic
 
 import (
-	"anime-community/common/logs"
-	"anime-community/config"
 	"context"
 	"sync"
 
 	"github.com/elastic/go-elasticsearch/v7"
+
+	"anime-community/common/logs"
+	"anime-community/config"
 )
 
 var communityClient *elasticsearch.Client

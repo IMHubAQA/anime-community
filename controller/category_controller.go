@@ -18,9 +18,18 @@ func (c *CategoryController) List() {
 	defer helper.Recover(ctx, func() {
 		c.FailJsonResp(constants.ServerError)
 	})
-	data, err := redis.GetPostsCategoryList(ctx, c.GetString("postType"))
+
+	postType, err := c.GetInt("postType")
+	if err != nil || postType <= 0 {
+		logs.Warnf(ctx, "CategoryController List ParseForm fail. err=%v", err)
+		c.FailJsonResp(constants.InvalidParamsError)
+		return
+	}
+
+	data, err := redis.GetPostsCategoryList(ctx, postType)
 	if err != nil {
-		c.FailJsonResp(constants.RdisError)
+		c.FailJsonResp(constants.RedisError)
+		return
 	}
 
 	resp := httpc.NewHttpResult().OkWithData(data).Build()

@@ -14,6 +14,7 @@ type CommentController struct {
 	BaseController
 }
 
+// 评论列表
 func (c *CommentController) List() {
 	ctx := logs.NewTraceContext(c.Ctx.Request.Context())
 	defer helper.Recover(ctx, func() {
@@ -42,6 +43,7 @@ func (c *CommentController) List() {
 	c.JsonResp(resp)
 }
 
+// 发评论
 func (c *CommentController) Create() {
 	ctx := logs.NewTraceContext(c.Ctx.Request.Context())
 	defer helper.Recover(ctx, func() {

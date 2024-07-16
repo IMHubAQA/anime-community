@@ -75,6 +75,7 @@ func (c *PostsController) Create() {
 	redis.UnLock(ctx, routerLock, header.Uid)
 }
 
+// 帖子详情
 func (c *PostsController) Info() {
 	ctx := logs.NewTraceContext(c.Ctx.Request.Context())
 	defer helper.Recover(ctx, func() {
@@ -98,5 +99,26 @@ func (c *PostsController) Info() {
 	}
 
 	resp := httpc.NewHttpResult().OkWithData(data).Build()
+	c.JsonResp(resp)
+}
+
+// 帖子搜索
+func (c *PostsController) Search() {
+	ctx := logs.NewTraceContext(c.Ctx.Request.Context())
+	defer helper.Recover(ctx, func() {
+		c.FailJsonResp(constants.ServerError)
+	})
+
+	req := &modelv.PostSearchReq{}
+	err := c.BindJSON(&req)
+	if err != nil || !req.Check() {
+		logs.Warnf(ctx, "PostsController Search BindJSON fail. err=%v", err)
+		c.FailJsonResp(constants.InvalidParamsError)
+		return
+	}
+
+	logs.Infof(ctx, "PostsController Search req=%+v", req)
+
+	resp := httpc.NewHttpResult().OkWithData(nil).Build()
 	c.JsonResp(resp)
 }

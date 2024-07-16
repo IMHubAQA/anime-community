@@ -60,7 +60,7 @@ func GetPostsCategory(ctx context.Context, ids []int) (map[int]*modelc.PostCateg
 	return res, nil
 }
 
-func GetPostsCategoryList(ctx context.Context, postType string) ([]*modelc.PostCategoryCache, error) {
+func GetPostsCategoryList(ctx context.Context, postType int) ([]*modelc.PostCategoryCache, error) {
 	b, err := GetCommunityClient().Get(ctx, PostCategoryRedisKey.GetKey("list", postType)).Result()
 	if err != nil {
 		return nil, err

@@ -83,3 +83,19 @@ func (req *PostInfoReq) Check() bool {
 	}
 	return req.PostId > 0
 }
+
+type PostSearchReq struct {
+	Keyword  string `json:"keyword"` // 关键词
+	Page     uint64 `json:"page"`
+	PostType int    `json:"postType"` // 帖子类型
+}
+
+func (b *PostSearchReq) Check() bool {
+	if b == nil {
+		return false
+	}
+	if b.Keyword == "" {
+		return false
+	}
+	return true
+}
