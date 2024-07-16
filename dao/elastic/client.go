@@ -1,8 +1,7 @@
-package elasticc
+package elastic
 
 import (
 	"context"
-	"log"
 	"sync"
 
 	"github.com/elastic/go-elasticsearch/v8"
@@ -17,9 +16,9 @@ var initOnce sync.Once
 func Init(ctx context.Context) {
 	initOnce.Do(func() {
 		communityClient = newElasticClient(ctx)
-		// 检查Elasticsearch服务是否可达
+		// 检查服务是否可达
 		if _, err := communityClient.Ping(); err != nil {
-			log.Fatalf("elastic is down: %s", err)
+			logs.Fatalf(ctx, "elastic is down: %s", err)
 		}
 		logs.Infof(ctx, "load elastic success. ")
 	})
@@ -27,7 +26,6 @@ func Init(ctx context.Context) {
 }
 
 func newElasticClient(ctx context.Context) *elasticsearch.Client {
-	log.Println(config.GetServerConfig().ElasticConfig.Addr)
 	client, err := elasticsearch.NewClient(elasticsearch.Config{
 		Addresses: config.GetServerConfig().ElasticConfig.Addr,
 	})
