@@ -4,6 +4,7 @@ go 1.20
 
 require (
 	github.com/beego/beego/v2 v2.0.2
+	github.com/elastic/go-elasticsearch/v7 v7.17.10
 	github.com/go-redis/redis/v8 v8.11.5
 	github.com/google/uuid v1.6.0
 	go.uber.org/zap v1.21.0
