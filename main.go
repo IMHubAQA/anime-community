@@ -9,7 +9,7 @@ import (
 	"anime-community/common/helper"
 	"anime-community/common/logs"
 	"anime-community/config"
-	"anime-community/dao/elasticc"
+	"anime-community/dao/elastic"
 	"anime-community/dao/mysql"
 	"anime-community/dao/redis"
 	"anime-community/router"
@@ -30,7 +30,7 @@ func InitServer(ctx context.Context) {
 
 	redis.Init(ctx)
 	mysql.Init(ctx)
-	elasticc.Init(ctx)
+	elastic.Init(ctx)
 
 	if Tool(ctx) {
 		return

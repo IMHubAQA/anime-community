@@ -22,7 +22,7 @@ func ExportPostCategory(ctx context.Context) error {
 		for _, postCategory := range postCategorys {
 			cacheValues = append(cacheValues, modelc.NewPostCategoryCache(postCategory))
 		}
-		err = redis.SetPostsCategory(ctx, cacheValues)
+		err = redis.SetPostsCategory(ctx, postType, cacheValues)
 		if err != nil {
 			logs.Errorf(ctx, "ExportPostCategory SetPostsCategory fail. postType=%v,err=%v", postType, err)
 		}

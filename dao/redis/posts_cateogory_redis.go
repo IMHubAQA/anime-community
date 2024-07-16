@@ -9,17 +9,21 @@ import (
 )
 
 // 保存帖子标签信息
-func SetPostsCategory(ctx context.Context, cacheValues []*modelc.PostCategoryCache) error {
+func SetPostsCategory(ctx context.Context, postType int, cacheValues []*modelc.PostCategoryCache) error {
 	if len(cacheValues) == 0 {
 		return nil
 	}
-	keys, values := make([]string, len(cacheValues)), make([]string, len(cacheValues))
+	keys, values := make([]string, len(cacheValues)+1), make([]string, len(cacheValues)+1)
 
 	for i, cacheValue := range cacheValues {
 		keys[i] = PostCategoryRedisKey.GetKey(cacheValue.Id)
 		b, _ := json.Marshal(cacheValue)
 		values[i] = string(b)
 	}
+
+	keys[len(keys)-1] = PostCategoryRedisKey.GetKey("list", postType)
+	b, _ := json.Marshal(cacheValues)
+	values[len(values)-1] = string(b)
 
 	return MutiSet(ctx, keys, values, PostCategoryRedisKey.GetExpire())
 }
@@ -52,6 +56,19 @@ func GetPostsCategory(ctx context.Context, ids []int) (map[int]*modelc.PostCateg
 			continue
 		}
 		res[keyMap[key]] = pcc
+	}
+	return res, nil
+}
+
+func GetPostsCategoryList(ctx context.Context, postType string) ([]*modelc.PostCategoryCache, error) {
+	b, err := GetCommunityClient().Get(ctx, PostCategoryRedisKey.GetKey("list", postType)).Result()
+	if err != nil {
+		return nil, err
+	}
+	res := []*modelc.PostCategoryCache{}
+	err = json.Unmarshal([]byte(b), &res)
+	if err != nil {
+		return nil, err
 	}
 	return res, nil
 }
