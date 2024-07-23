@@ -119,6 +119,18 @@ func (c *PostsController) Search() {
 
 	logs.Infof(ctx, "PostsController Search req=%+v", req)
 
-	resp := httpc.NewHttpResult().OkWithData(nil).Build()
+	// FIXME :暂时先用list接口作为搜索返回吧，方便联调，数据结构一样，相当于搜索无效。
+	data, err1 := service.GetPostList(ctx, &modelv.PostListReq{
+		Page:     req.Page,
+		PostType: uint64(req.PostType),
+		PageSize: 10,
+	})
+
+	if err1 != nil {
+		c.FailJsonResp(err1)
+		return
+	}
+
+	resp := httpc.NewHttpResult().OkWithData(data).Build()
 	c.JsonResp(resp)
 }

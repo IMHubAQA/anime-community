@@ -4,6 +4,7 @@ import (
 	"context"
 	"crypto/sha256"
 	"strconv"
+	"time"
 
 	beegoctx "github.com/beego/beego/v2/server/web/context"
 
@@ -15,7 +16,7 @@ type BaseHeader struct {
 	Uid     int    `form:"-"` // 用户id
 	UToken  string `form:"-"` // 登录token
 	Sign    string `form:"-"` // 签名
-	TimeStr string `form:"-"` // 客户端请求时间
+	TimeStr string `form:"-"` // 客户端请求时间，ms
 }
 
 func GetAndCheckBaseHeader(ctx context.Context, beegoCtx *beegoctx.Context) (*BaseHeader, *constants.Error) {
@@ -30,6 +31,12 @@ func GetAndCheckBaseHeader(ctx context.Context, beegoCtx *beegoctx.Context) (*Ba
 	if header.Uid <= 0 || header.UToken == "" {
 		return nil, constants.NewErrorWithMsg("invalid uid or token")
 
+	}
+
+	now := time.Now().Unix() * 1000
+	clientTime, _ := strconv.Atoi(header.TimeStr)
+	if now-int64(clientTime) > 60000 { // 请求超过1分钟
+		return nil, constants.NewErrorWithMsg("签名已过期")
 	}
 
 	if !helper.CheckSign(ctx, header.Sign, sha256.New(), uid, header.TimeStr, string(beegoCtx.Input.RequestBody)) {

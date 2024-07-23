@@ -1,10 +1,11 @@
 package helper
 
 import (
-	"anime-community/common/logs"
 	"context"
 	"encoding/hex"
 	"hash"
+
+	"anime-community/common/logs"
 )
 
 func CheckSign(ctx context.Context, sign string, hashFunc hash.Hash, params ...string) bool {
