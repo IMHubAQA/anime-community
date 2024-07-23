@@ -13,7 +13,7 @@ func CheckSign(ctx context.Context, sign string, hashFunc hash.Hash, params ...s
 	}
 	validSign := hex.EncodeToString(hashFunc.Sum(nil))
 	if sign != validSign {
-		logs.Infof(ctx, "CheckSign fail. sign=%v validSign=%v", sign, validSign)
+		logs.Infof(ctx, "CheckSign fail. sign=%v validSign=%v params=%v", sign, validSign, params)
 	}
 	return sign == validSign
 }
