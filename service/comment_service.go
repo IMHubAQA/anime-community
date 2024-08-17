@@ -3,10 +3,12 @@ package service
 import (
 	"context"
 	"encoding/json"
+	"time"
 
 	"anime-community/common/constants"
 	"anime-community/common/helper"
 	"anime-community/common/logs"
+	commservice "anime-community/common/service"
 	"anime-community/dao/mysql"
 	"anime-community/dao/redis"
 	modele "anime-community/model/entity"
@@ -20,15 +22,13 @@ func GetCommentList(ctx context.Context, req *modelv.CommentListReq) (*modelv.Co
 		logs.Errorf(ctx, "GetCommentList GetCommentByReplyType. err=%v", err)
 		return nil, constants.MysqlError
 	}
+	userInfom := getCommentExtraData(ctx, commentList)
 	commentRespList := []*modelv.CommentData{}
 	for _, comment := range commentList {
 		data := &modelv.CommentData{
-			CommentId: uint64(comment.Id),
-			Content:   comment.Content,
-			Author: &modelv.AuthorData{
-				Uid:  1,
-				Name: "哈哈哈哈",
-			},
+			CommentId:  uint64(comment.Id),
+			Content:    comment.Content,
+			Author:     buildAuthor(ctx, userInfom[int(comment.UserId)]),
 			CreateTime: uint64(comment.CreateTime),
 			PostId:     uint64(comment.PostId),
 		}
@@ -78,4 +78,22 @@ func CreateComment(ctx context.Context, req *modelv.BaseHeader, body []byte) *co
 		}
 	}()
 	return nil
+}
+
+func getCommentExtraData(ctx context.Context, comments []*modele.AnimeComment) map[int]*commservice.UserData {
+	userIds := []int64{}
+	userm := map[int64]struct{}{}
+	for _, comment := range comments {
+		if _, ok := userm[comment.UserId]; ok {
+			continue
+		}
+		userIds = append(userIds, comment.UserId)
+		userm[comment.UserId] = struct{}{}
+	}
+	userInfom, err := commservice.MGetUserInfom(ctx, &commservice.MGetUserReq{UserIds: userIds}, time.Second)
+	if err != nil {
+		logs.Warnf(ctx, "getCommentExtraData MGetUserInfom fail. err=%v", err)
+		return nil
+	}
+	return userInfom
 }

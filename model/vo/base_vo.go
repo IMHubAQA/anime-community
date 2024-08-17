@@ -10,6 +10,7 @@ import (
 
 	"anime-community/common/constants"
 	"anime-community/common/helper"
+	commservice "anime-community/common/service"
 )
 
 type BaseHeader struct {
@@ -41,6 +42,11 @@ func GetAndCheckBaseHeader(ctx context.Context, beegoCtx *beegoctx.Context) (*Ba
 
 	if !helper.CheckSign(ctx, header.Sign, sha256.New(), uid, header.TimeStr, string(beegoCtx.Input.RequestBody)) {
 		return nil, constants.InvalidSignError
+	}
+
+	_, err := commservice.VerifyToken(ctx, &commservice.VerifyTokenReq{UserId: header.Uid, Token: header.UToken}, time.Second)
+	if err != nil {
+		return nil, constants.NewErrorWithMsg("验证token失败:" + err.Error())
 	}
 	return header, nil
 }

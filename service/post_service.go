@@ -3,9 +3,11 @@ package service
 import (
 	"context"
 	"encoding/json"
+	"time"
 
 	"anime-community/common/constants"
 	"anime-community/common/logs"
+	commservice "anime-community/common/service"
 	"anime-community/dao/mysql"
 	"anime-community/dao/redis"
 	modele "anime-community/model/entity"
@@ -41,11 +43,11 @@ func GetPostById(ctx context.Context, req *modelv.PostInfoReq) (*modelv.PostData
 		return nil, constants.MysqlError
 	}
 
-	categorym := getCategoryInfo(ctx, []*modele.AnimePost{post})
+	categorym, userInfom := getPostextraData(ctx, []*modele.AnimePost{post})
 
 	data := buildPostData(ctx, post)
 	data.Category = categorym[int64(post.Id)]
-	data = buildPostAuthor(ctx, data, post.UserId)
+	data.Author = buildAuthor(ctx, userInfom[int(post.UserId)])
 	return data, nil
 }
 
@@ -57,13 +59,13 @@ func GetPostList(ctx context.Context, req *modelv.PostListReq) (*modelv.PostList
 		return nil, constants.MysqlError
 	}
 
-	categorym := getCategoryInfo(ctx, posts)
+	categorym, userInfom := getPostextraData(ctx, posts)
 
 	datas := []*modelv.PostData{}
 	for _, post := range posts {
 		data := buildPostData(ctx, post)
 		data.Category = categorym[int64(post.Id)]
-		data = buildPostAuthor(ctx, data, post.UserId)
+		data.Author = buildAuthor(ctx, userInfom[int(post.UserId)])
 		datas = append(datas, data)
 	}
 
@@ -74,12 +76,14 @@ func GetPostList(ctx context.Context, req *modelv.PostListReq) (*modelv.PostList
 }
 
 // 获取标签信息
-func getCategoryInfo(
+func getPostextraData(
 	ctx context.Context,
 	posts []*modele.AnimePost,
-) map[int64][]*modelv.PostDataCategory {
+) (map[int64][]*modelv.PostDataCategory, map[int]*commservice.UserData) {
 	categoryIds := []int{}
 	postcIdMap := make(map[int64][]int)
+	// FIXME: make data split
+	userIds := []int64{}
 	for _, post := range posts {
 		category := []int{}
 		err := json.Unmarshal([]byte(post.Category), &category)
@@ -88,12 +92,13 @@ func getCategoryInfo(
 		}
 		postcIdMap[post.Id] = category
 		categoryIds = append(categoryIds, category...)
+		userIds = append(userIds, post.UserId)
 	}
 
 	categorym, err := redis.GetPostsCategory(ctx, categoryIds)
 	if err != nil {
 		logs.Warnf(ctx, "GetHomePage GetPostsCategory fail. err=%v", err)
-		return nil
+		return nil, nil
 	}
 	postCategoryInfo := make(map[int64][]*modelv.PostDataCategory)
 	for postId, ids := range postcIdMap {
@@ -107,24 +112,29 @@ func getCategoryInfo(
 			}
 		}
 	}
-	return postCategoryInfo
+	userInfom, err := commservice.MGetUserInfom(ctx, &commservice.MGetUserReq{UserIds: userIds}, time.Second)
+	if err != nil {
+		logs.Warnf(ctx, "GetHomePage GetPostsCategory fail. err=%v", err)
+	}
+	return postCategoryInfo, userInfom
 }
 
 // 生成用户信息
-func buildPostAuthor(
+func buildAuthor(
 	ctx context.Context,
-	data *modelv.PostData,
-	userId int64,
-) *modelv.PostData {
-	data.Author = &modelv.AuthorData{
-		Uid:  uint64(userId),
-		Name: "哈哈",
+	userInfo *commservice.UserData,
+) *modelv.AuthorData {
+	if userInfo != nil {
+		return nil
 	}
-	return data
+	return &modelv.AuthorData{
+		Uid:  uint64(userInfo.ID),
+		Name: userInfo.NickName,
+		Icon: userInfo.AvatarURL,
+	}
 }
 
 func CreatePost(ctx context.Context, req *modelv.BaseHeader, body []byte) *constants.Error {
-	//TODO: AUTH
 	bodyData := &modelv.PostCreateBody{}
 	err := json.Unmarshal(body, bodyData)
 	if err != nil {
