@@ -14,6 +14,7 @@ import (
 	modelv "anime-community/model/vo"
 )
 
+// 生成客户端帖子数据结构
 func buildPostData(ctx context.Context, post *modele.AnimePost) *modelv.PostData {
 	data := &modelv.PostData{
 		PostId:      uint64(post.Id),
@@ -124,7 +125,7 @@ func buildAuthor(
 	ctx context.Context,
 	userInfo *commservice.UserData,
 ) *modelv.AuthorData {
-	if userInfo != nil {
+	if userInfo == nil {
 		return nil
 	}
 	return &modelv.AuthorData{
